@@ -192,3 +192,84 @@ def get_hotspots():
         {"region": "Mumbai", "risk_score": 0.9},
         {"region": "Delhi", "risk_score": 0.85}
     ]
+
+# --- Dashboard Support ---
+
+@router.get("/dashboard/alerts")
+def get_dashboard_alerts():
+    return [
+        {
+            "id": 1,
+            "type": "Critical Alert",
+            "message": "Dengue spike detected in Mumbai Region",
+            "detail": "Predicted +40% cases in 7 days.",
+            "time": "2m ago",
+            "severity": "high"
+        },
+        {
+            "id": 2,
+            "type": "Warning",
+            "message": "High Malaria risk in Coastal Zones",
+            "detail": "Due to recent heavy rainfall.",
+            "time": "1h ago",
+            "severity": "medium"
+        },
+        {
+            "id": 3,
+            "type": "Info",
+            "message": "Vaccination drive scheduled for Delhi",
+            "detail": "Starting next Monday.",
+            "time": "3h ago",
+            "severity": "low"
+        }
+    ]
+
+@router.get("/dashboard/insights")
+def get_dashboard_insights():
+    return {
+        "title": "Supply chain disruption risk is High for Artemisinin due to flooding in Vietnam.",
+        "action": "View Recommendations",
+        "severity": "high"
+    }
+
+# --- HealthCast Support ---
+
+@router.get("/health-cast/local-weather")
+def get_local_weather(lat: float = 19.0760, lng: float = 72.8777):
+    # Mock data based on coords
+    return {
+        "location": "Mumbai, Bandra",
+        "temperature": 28,
+        "condition": "Partly Cloudy",
+        "feels_like": 32,
+        "aqi": 156,
+        "safety_score": 85,
+        "updated": "5m ago"
+    }
+
+@router.get("/health-cast/alerts")
+def get_health_cast_alerts():
+    return [
+        {"id": 1, "type": "critical", "title": "Dengue Outbreak Alert", "message": "High mosquito activity detected in your area (Zone 4). Use repellent and wear long sleeves.", "time": "10m ago"},
+        {"id": 2, "type": "warning", "title": "Air Quality Warning", "message": "AQI is 156 (Unhealthy). Sensitive groups should avoid outdoor exertion.", "time": "1h ago"},
+        {"id": 3, "type": "info", "title": "Vaccination Drive", "message": "Free flu shots available at City Center Mall this weekend.", "time": "3h ago"}
+    ]
+
+@router.get("/health-cast/safe-zones")
+def get_safe_zones(lat: float = 19.0760, lng: float = 72.8777):
+    return [
+        {
+            "id": 1,
+            "name": "City Pharmacy",
+            "distance": "0.8 km",
+            "status": "Open",
+            "features": ["Masks Available", "Repellent Stocked"]
+        },
+        {
+            "id": 2,
+            "name": "Community Health Center",
+            "distance": "1.2 km",
+            "status": "Open",
+            "features": ["Emergency Care", "Testing Lab"]
+        }
+    ]

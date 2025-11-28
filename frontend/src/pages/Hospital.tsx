@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Building2,
     Plus,
@@ -7,25 +7,66 @@ import {
     CheckCircle2,
     AlertCircle,
     Clock,
-    Package
+    Package,
+    X
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { ServiceB } from '../api/client';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Hospital = () => {
     const [activeTab, setActiveTab] = useState('requests');
+    const [networkStatus, setNetworkStatus] = useState<any[]>([]);
+    const [requests, setRequests] = useState<any[]>([]);
+    const [showRequestModal, setShowRequestModal] = useState(false);
+    const [newRequest, setNewRequest] = useState({
+        type: 'ICU Beds',
+        quantity: 0,
+        urgency: 'High'
+    });
 
-    const requests = [
-        { id: 'REQ-1023', hospital: 'City General Hospital', item: 'Oseltamivir (Tamiflu)', quantity: 5000, status: 'urgent', time: '2h ago' },
-        { id: 'REQ-1022', hospital: 'St. Mary\'s Medical Center', item: 'IV Fluids (Saline)', quantity: 2000, status: 'pending', time: '4h ago' },
-        { id: 'REQ-1021', hospital: 'Community Health Clinic', item: 'Dengue Test Kits', quantity: 500, status: 'fulfilled', time: '1d ago' },
-    ];
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [networkRes, requestsRes] = await Promise.all([
+                    ServiceB.getHospitalNetwork(),
+                    ServiceB.getHospitalRequests()
+                ]);
+                setNetworkStatus(networkRes.data);
+                setRequests(requestsRes.data);
+            } catch (error) {
+                console.error("Failed to fetch hospital data", error);
+            }
+        };
 
-    const hospitals = [
-        { id: 'H001', name: 'City General Hospital', location: 'Mumbai, Central', capacity: '85%', status: 'critical' },
-        { id: 'H002', name: 'Apollo Indraprastha', location: 'Delhi, South', capacity: '60%', status: 'stable' },
-        { id: 'H003', name: 'Fortis Malar', location: 'Chennai, Adyar', capacity: '45%', status: 'stable' },
-    ];
+        fetchData();
+    }, []);
+
+    const handleCreateRequest = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await ServiceB.createHospitalRequest(newRequest);
+            alert("Request created successfully!");
+            setShowRequestModal(false);
+            // Refresh requests
+            const res = await ServiceB.getHospitalRequests();
+            setRequests(res.data);
+        } catch (error) {
+            console.error("Failed to create request", error);
+        }
+    };
+
+    const handleFulfillRequest = async (requestId: string) => {
+        try {
+            await ServiceB.fulfillRequest(requestId);
+            alert("Request fulfilled!");
+            // Refresh requests
+            const res = await ServiceB.getHospitalRequests();
+            setRequests(res.data);
+        } catch (error) {
+            console.error("Failed to fulfill request", error);
+        }
+    };
 
     return (
         <motion.div
@@ -40,7 +81,7 @@ const Hospital = () => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent"
+                        className="text-2xl font-bold bg-gradient-to-r from-red-400 to-orange-300 bg-clip-text text-transparent"
                     >
                         Hospital Collaboration Hub
                     </motion.h1>
@@ -50,7 +91,7 @@ const Hospital = () => {
                         transition={{ delay: 0.3 }}
                         className="text-muted-foreground"
                     >
-                        Coordinate resources and manage critical shortages across the network.
+                        Real-time resource sharing and capacity management network.
                     </motion.p>
                 </div>
                 <motion.button
@@ -59,7 +100,8 @@ const Hospital = () => {
                     transition={{ delay: 0.4 }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 flex items-center gap-2 shadow-lg shadow-primary/25"
+                    onClick={() => setShowRequestModal(true)}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2 shadow-lg shadow-red-600/20 transition-all"
                 >
                     <Plus className="w-4 h-4" /> New Request
                 </motion.button>
@@ -89,7 +131,7 @@ const Hospital = () => {
                         </div>
                     </div>
                     <div className="flex-1 overflow-y-auto p-2 space-y-2 custom-scrollbar">
-                        {hospitals.map((hospital, index) => (
+                        {networkStatus.map((hospital, index) => (
                             <motion.div
                                 key={hospital.id}
                                 initial={{ opacity: 0, y: 10 }}
@@ -102,25 +144,25 @@ const Hospital = () => {
                                     <span className="font-medium group-hover:text-primary transition-colors">{hospital.name}</span>
                                     <span className={cn(
                                         "text-[10px] px-2 py-0.5 rounded-full uppercase font-bold",
-                                        hospital.status === 'critical' ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"
+                                        hospital.status === 'Critical' ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"
                                     )}>
                                         {hospital.status}
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                                    <MapPin className="w-3 h-3" /> {hospital.location}
+                                    <MapPin className="w-3 h-3" /> {hospital.location || 'Unknown Location'}
                                 </div>
                                 <div className="w-full bg-muted-foreground/20 h-1.5 rounded-full overflow-hidden">
                                     <motion.div
                                         initial={{ width: 0 }}
-                                        animate={{ width: hospital.capacity }}
+                                        animate={{ width: `${hospital.capacity}%` }}
                                         transition={{ duration: 1, delay: 0.8 + index * 0.1 }}
-                                        className={cn("h-full rounded-full", parseInt(hospital.capacity) > 80 ? "bg-red-500" : "bg-blue-500")}
+                                        className={cn("h-full rounded-full", hospital.capacity > 80 ? "bg-red-500" : "bg-blue-500")}
                                     />
                                 </div>
                                 <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
                                     <span>Capacity</span>
-                                    <span>{hospital.capacity}</span>
+                                    <span>{hospital.capacity}%</span>
                                 </div>
                             </motion.div>
                         ))}
@@ -192,8 +234,8 @@ const Hospital = () => {
                                             <div className="flex items-center gap-4">
                                                 <div className={cn(
                                                     "w-10 h-10 rounded-full flex items-center justify-center",
-                                                    req.status === 'urgent' ? "bg-red-500/10 text-red-500" :
-                                                        req.status === 'fulfilled' ? "bg-green-500/10 text-green-500" : "bg-yellow-500/10 text-yellow-500"
+                                                    req.urgency === 'Critical' ? "bg-red-500/10 text-red-500" :
+                                                        req.status === 'Fulfilled' ? "bg-green-500/10 text-green-500" : "bg-yellow-500/10 text-yellow-500"
                                                 )}>
                                                     <Package className="w-5 h-5" />
                                                 </div>
@@ -204,23 +246,24 @@ const Hospital = () => {
                                             </div>
                                             <div className="text-right">
                                                 <div className="flex items-center gap-2 justify-end mb-1">
-                                                    {req.status === 'urgent' && <AlertCircle className="w-4 h-4 text-red-500 animate-pulse" />}
-                                                    {req.status === 'fulfilled' && <CheckCircle2 className="w-4 h-4 text-green-500" />}
-                                                    {req.status === 'pending' && <Clock className="w-4 h-4 text-yellow-500" />}
+                                                    {req.urgency === 'Critical' && <AlertCircle className="w-4 h-4 text-red-500 animate-pulse" />}
+                                                    {req.status === 'Fulfilled' && <CheckCircle2 className="w-4 h-4 text-green-500" />}
+                                                    {req.status === 'Pending' && <Clock className="w-4 h-4 text-yellow-500" />}
                                                     <span className={cn(
                                                         "text-sm font-medium capitalize",
-                                                        req.status === 'urgent' ? "text-red-500" :
-                                                            req.status === 'fulfilled' ? "text-green-500" : "text-yellow-500"
+                                                        req.urgency === 'Critical' ? "text-red-500" :
+                                                            req.status === 'Fulfilled' ? "text-green-500" : "text-yellow-500"
                                                     )}>{req.status}</span>
                                                 </div>
                                                 <p className="text-xs text-muted-foreground">{req.time}</p>
                                             </div>
 
-                                            {req.status !== 'fulfilled' && (
+                                            {req.status !== 'Fulfilled' && (
                                                 <div className="ml-4 pl-4 border-l border-border/50">
                                                     <motion.button
                                                         whileHover={{ scale: 1.05 }}
                                                         whileTap={{ scale: 0.95 }}
+                                                        onClick={() => handleFulfillRequest(req.id)}
                                                         className="px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded text-sm font-medium transition-colors"
                                                     >
                                                         Fulfill
@@ -249,6 +292,84 @@ const Hospital = () => {
                     </div>
                 </motion.div>
             </div>
+
+            {/* Create Request Modal */}
+            <AnimatePresence>
+                {showRequestModal && (
+                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-background border border-border rounded-xl p-6 w-full max-w-md shadow-2xl"
+                        >
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-bold flex items-center gap-2">
+                                    <Plus className="w-5 h-5 text-red-500" />
+                                    New Resource Request
+                                </h2>
+                                <button onClick={() => setShowRequestModal(false)} className="text-muted-foreground hover:text-foreground transition-colors">
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                            <form onSubmit={handleCreateRequest} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Resource Type</label>
+                                    <select
+                                        className="w-full p-2 bg-muted/50 border border-border rounded-lg focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all outline-none"
+                                        value={newRequest.type}
+                                        onChange={e => setNewRequest({ ...newRequest, type: e.target.value })}
+                                    >
+                                        <option>ICU Beds</option>
+                                        <option>Ventilators</option>
+                                        <option>PPE Kits</option>
+                                        <option>O2 Cylinders</option>
+                                        <option>Vaccines</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Quantity</label>
+                                    <input
+                                        type="number"
+                                        required
+                                        className="w-full p-2 bg-muted/50 border border-border rounded-lg focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all outline-none"
+                                        value={newRequest.quantity}
+                                        onChange={e => setNewRequest({ ...newRequest, quantity: parseInt(e.target.value) })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Urgency</label>
+                                    <select
+                                        className="w-full p-2 bg-muted/50 border border-border rounded-lg focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all outline-none"
+                                        value={newRequest.urgency}
+                                        onChange={e => setNewRequest({ ...newRequest, urgency: e.target.value })}
+                                    >
+                                        <option>Low</option>
+                                        <option>Medium</option>
+                                        <option>High</option>
+                                        <option>Critical</option>
+                                    </select>
+                                </div>
+                                <div className="flex gap-2 pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowRequestModal(false)}
+                                        className="flex-1 py-2 border border-border rounded-lg hover:bg-muted transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 shadow-lg shadow-red-600/20 transition-all"
+                                    >
+                                        Submit Request
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </motion.div>
     );
 };

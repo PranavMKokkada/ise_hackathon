@@ -17,7 +17,16 @@ def run_simulation(parameters: dict, db: Session = Depends(get_db)):
     # Store results (mock)
     # In real app, save to DB
     
-    return {"simulation_id": simulation_id, "status": "COMPLETED", "results": results}
+    return {
+        "simulation_id": simulation_id,
+        "status": "COMPLETED",
+        "results": {
+            "predicted_cases": results["predicted_outcomes"]["average_cases"],
+            "new_hotspots": 3,
+            "supply_shortages": 12,
+            "system_impact_score": 78
+        }
+    }
 
 @router.get("/results/{simulation_id}")
 def get_simulation_results(simulation_id: str, db: Session = Depends(get_db)):
@@ -35,3 +44,8 @@ def get_scenarios(db: Session = Depends(get_db)):
 def delete_simulation(simulation_id: str, db: Session = Depends(get_db)):
     # In real implementation: db.query(SimulationResult).filter(...).delete()
     return {"message": f"Simulation {simulation_id} deleted"}
+
+@router.post("/scenarios")
+def save_scenario(scenario: dict, db: Session = Depends(get_db)):
+    # Mock save
+    return {"message": "Scenario saved successfully", "id": "SCN-001"}

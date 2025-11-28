@@ -8,7 +8,7 @@ import os
 from dotenv import load_dotenv
 
 # Import routers
-from routers import graph, disruptions, inventory, suppliers, routing
+from routers import graph, disruptions, inventory, suppliers, routing, hospital
 
 load_dotenv()
 
@@ -33,6 +33,7 @@ app.include_router(disruptions.router, prefix="/disruptions", tags=["Disruptions
 app.include_router(inventory.router, prefix="/inventory", tags=["Inventory"])
 app.include_router(suppliers.router, prefix="/suppliers", tags=["Suppliers"])
 app.include_router(routing.router, prefix="/routing", tags=["Routing"])
+app.include_router(hospital.router, prefix="/hospital", tags=["Hospital"])
 
 @app.get("/")
 def root():

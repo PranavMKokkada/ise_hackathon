@@ -1,34 +1,6 @@
-"""
-Graph Data Router - Supply Chain Network Endpoints
-"""
-from fastapi import APIRouter, HTTPException
 from typing import Dict, Any
-from database.neo4j_client import neo4j_client
+from fastapi import HTTPException
 
-router = APIRouter()
-
-@router.get("/full-graph")
-def get_full_graph() -> Dict[str, Any]:
-    """Get complete supply chain graph with all nodes and relationships"""
-    try:
-        return neo4j_client.get_full_graph()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@router.get("/disease/{disease_id}")
-def get_disease_supply_chain(disease_id: str) -> Dict[str, Any]:
-    """Get supply chain network for a specific disease"""
-    try:
-        result = neo4j_client.get_disease_supply_chain(disease_id)
-        if not result["nodes"]:
-            raise HTTPException(status_code=404, detail="Disease not found")
-        return result
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@router.get("/node/{node_id}")
 def get_node_details(node_id: str) -> Dict[str, Any]:
     """Get details for a specific node in the graph"""
     try:

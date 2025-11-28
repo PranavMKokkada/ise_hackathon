@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
     MapPin,
     Bell,
@@ -6,17 +7,37 @@ import {
     Wind,
     Navigation,
     Share2,
-    Info
+    Info,
+    CloudRain,
+    Settings
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { MockServiceA } from '../api/client';
 import { motion } from 'framer-motion';
 
 const HealthCast = () => {
-    const alerts = [
-        { id: 1, type: 'critical', title: 'Dengue Outbreak Alert', message: 'High mosquito activity detected in your area (Zone 4). Use repellent and wear long sleeves.', time: '10m ago' },
-        { id: 2, type: 'warning', title: 'Air Quality Warning', message: 'AQI is 156 (Unhealthy). Sensitive groups should avoid outdoor exertion.', time: '1h ago' },
-        { id: 3, type: 'info', title: 'Vaccination Drive', message: 'Free flu shots available at City Center Mall this weekend.', time: '3h ago' },
-    ];
+    const [weather, setWeather] = useState<any>(null);
+    const [alerts, setAlerts] = useState<any[]>([]);
+    const [safeZones, setSafeZones] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [weatherRes, alertsRes, safeZonesRes] = await Promise.all([
+                    MockServiceA.getLocalWeather(),
+                    MockServiceA.getHealthCastAlerts(),
+                    MockServiceA.getSafeZones()
+                ]);
+                setWeather(weatherRes.data);
+                setAlerts(alertsRes.data);
+                setSafeZones(safeZonesRes.data);
+            } catch (error) {
+                console.error("Failed to fetch HealthCast data", error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <motion.div
@@ -51,7 +72,7 @@ const HealthCast = () => {
                         <div>
                             <p className="text-primary-foreground/80 text-sm font-medium">Current Location</p>
                             <div className="flex items-center gap-1 font-bold text-lg">
-                                <MapPin className="w-4 h-4" /> Mumbai, Bandra
+                                <MapPin className="w-4 h-4" /> {weather?.location || 'Unknown'}
                             </div>
                         </div>
                         <motion.div
@@ -72,15 +93,15 @@ const HealthCast = () => {
                                 transition={{ delay: 0.2 }}
                                 className="text-4xl font-bold"
                             >
-                                28°C
+                                {weather?.temperature || '--'}°C
                             </motion.h1>
-                            <p className="text-primary-foreground/80">Partly Cloudy</p>
+                            <p className="text-primary-foreground/80">{weather?.condition || 'Loading...'}</p>
                         </div>
                         <div className="text-right">
                             <p className="text-sm font-medium bg-white/20 px-3 py-1 rounded-full inline-block mb-1 backdrop-blur-sm">
-                                Risk Level: Moderate
+                                Risk Level: {weather?.risk_level || 'Unknown'}
                             </p>
-                            <p className="text-xs text-primary-foreground/70">Updated 5m ago</p>
+                            <p className="text-xs text-primary-foreground/70">Updated Just Now</p>
                         </div>
                     </div>
                 </div>
@@ -98,8 +119,8 @@ const HealthCast = () => {
                             className="bg-card p-3 rounded-2xl shadow-sm border border-border text-center"
                         >
                             <Thermometer className="w-5 h-5 mx-auto text-orange-500 mb-1" />
-                            <p className="text-xs text-muted-foreground">Feels Like</p>
-                            <p className="font-bold">32°C</p>
+                            <p className="text-xs text-muted-foreground">Humidity</p>
+                            <p className="font-bold">{weather?.humidity || '--'}%</p>
                         </motion.div>
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -110,7 +131,7 @@ const HealthCast = () => {
                         >
                             <Wind className="w-5 h-5 mx-auto text-blue-500 mb-1" />
                             <p className="text-xs text-muted-foreground">AQI</p>
-                            <p className="font-bold text-yellow-500">156</p>
+                            <p className="font-bold text-yellow-500">{weather?.aqi || '--'}</p>
                         </motion.div>
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -120,8 +141,8 @@ const HealthCast = () => {
                             className="bg-card p-3 rounded-2xl shadow-sm border border-border text-center"
                         >
                             <ShieldAlert className="w-5 h-5 mx-auto text-purple-500 mb-1" />
-                            <p className="text-xs text-muted-foreground">Safety</p>
-                            <p className="font-bold">85%</p>
+                            <p className="text-xs text-muted-foreground">Precip</p>
+                            <p className="font-bold">{weather?.precipitation || '0'}%</p>
                         </motion.div>
                     </div>
 
@@ -143,15 +164,15 @@ const HealthCast = () => {
                                 >
                                     <div className={cn(
                                         "absolute left-0 top-0 bottom-0 w-1",
-                                        alert.type === 'critical' ? "bg-red-500" :
-                                            alert.type === 'warning' ? "bg-yellow-500" : "bg-blue-500"
+                                        alert.severity === 'Critical' ? "bg-red-500" :
+                                            alert.severity === 'High' ? "bg-orange-500" : "bg-blue-500"
                                     )}></div>
                                     <div className="flex justify-between items-start mb-1 pl-2">
                                         <span className={cn(
                                             "text-xs font-bold uppercase tracking-wider",
-                                            alert.type === 'critical' ? "text-red-500" :
-                                                alert.type === 'warning' ? "text-yellow-500" : "text-blue-500"
-                                        )}>{alert.type}</span>
+                                            alert.severity === 'Critical' ? "text-red-500" :
+                                                alert.severity === 'High' ? "text-orange-500" : "text-blue-500"
+                                        )}>{alert.severity}</span>
                                         <span className="text-[10px] text-muted-foreground">{alert.time}</span>
                                     </div>
                                     <h4 className="font-bold pl-2 mb-1">{alert.title}</h4>
@@ -168,18 +189,23 @@ const HealthCast = () => {
                         transition={{ delay: 0.9 }}
                     >
                         <h3 className="font-bold mb-3">Nearby Safe Zones</h3>
-                        <div className="bg-card p-4 rounded-2xl shadow-sm border border-border flex items-center gap-4 cursor-pointer hover:bg-muted/50 transition-colors">
-                            <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center text-green-500">
-                                <Navigation className="w-6 h-6" />
-                            </div>
-                            <div className="flex-1">
-                                <h4 className="font-bold">City Pharmacy</h4>
-                                <p className="text-xs text-muted-foreground">0.8 km away • Open until 10 PM</p>
-                                <div className="flex gap-2 mt-1">
-                                    <span className="text-[10px] bg-green-500/10 text-green-600 px-2 py-0.5 rounded-full">Masks Available</span>
-                                    <span className="text-[10px] bg-green-500/10 text-green-600 px-2 py-0.5 rounded-full">Repellent Stocked</span>
+                        <div className="space-y-3">
+                            {safeZones.map((zone, index) => (
+                                <div key={index} className="bg-card p-4 rounded-2xl shadow-sm border border-border flex items-center gap-4 cursor-pointer hover:bg-muted/50 transition-colors">
+                                    <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center text-green-500">
+                                        <Navigation className="w-6 h-6" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className="font-bold">{zone.name}</h4>
+                                        <p className="text-xs text-muted-foreground">{zone.distance} • {zone.status}</p>
+                                        <div className="flex gap-2 mt-1">
+                                            {zone.resources.map((res: string, idx: number) => (
+                                                <span key={idx} className="text-[10px] bg-green-500/10 text-green-600 px-2 py-0.5 rounded-full">{res}</span>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            ))}
                         </div>
                     </motion.div>
                 </div>
