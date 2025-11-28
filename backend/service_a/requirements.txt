@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+sqlalchemy
+pymysql
+redis
+prophet
+tensorflow
+pandas
+numpy
+python-multipart
+requests
+pytest
+httpx
+fpdf

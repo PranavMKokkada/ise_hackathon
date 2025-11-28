@@ -1,0 +1,648 @@
+### 1️⃣ Global Dashboard – “BioNexus Command Center”
+
+**Prompt:**
+Design a **1440px wide desktop Global Dashboard** for an enterprise bio-surveillance platform called **BioNexus**. The aesthetic is **Futuristic Enterprise SaaS, dark mode**, inspired by Palantir/SpaceX mission control: deep navy background, neon cyan accents, subtle grid lines, and clean data visualization.
+
+**Overall Layout & Structure**
+
+* **Viewport:** 1440px width desktop, no mobile layout in this screen.
+* **Top App Bar (64px height):** Full-width, sticky.
+
+  * Left: Product logo “BioNexus” (wordmark) + small “Command Center” label.
+  * Center: Global region selector (pill dropdown with flag/icon + text) and date/time indicator.
+  * Right: Icons for notifications (badge count), WebSocket connection status (dot), user avatar with name/role dropdown.
+* **Main Layout:** Two-column structure over a dark background.
+
+  * **Left (approx 70% width): Hero 3D Globe Panel.**
+  * **Right (approx 30% width): Side Panel with stacked cards** (Critical Alerts, Global Stats, Quick Actions).
+* **Bottom Dock:** Full-width **Timeline & Layer Toggle** strip.
+
+**Hero Panel – 3D Globe & Map Layers**
+
+* **Card style:** Large, edge-to-edge within left area, 24px padding, 20–24px border radius.
+* Background: slightly lighter dark (#050B1A) with subtle radial gradient.
+* Center: **3D globe** (placeholder illustration) with arcs and glowing hotspots.
+* Top-left of globe card: “Global Outbreak Map” title + mini legend (Outbreak risk, Environmental factors, Supply stress).
+* Top-right: **Layer toggle chips**:
+
+  * “Outbreak Risk”, “Environmental Drivers”, “Supply Chain Fragility”, “Mobility Flows”, “Shortages”.
+  * Each chip: pill with neon border when active; inactive chips use muted border.
+* On hover over hotspots: show small tooltip card with region name, risk score, outbreak status.
+
+**Right Side Panel – Alerts & Stats**
+
+* **Critical Alerts Feed (top card):**
+
+  * Title row: “Critical Alerts” + severity filter pill (All / High / Medium).
+  * Scrollable list of alert rows (auto-scroll vertical). Each row: alert icon, region, severity tag (red/amber badge), short description, timestamp.
+  * Hover: row lifts slightly with subtle glow, click opens details drawer (right slide-over, not separate screen).
+* **Global Statistics (middle card):**
+
+  * Four KPI tiles in 2x2 grid: “Active Outbreaks”, “Regions at High Risk”, “Critical Shortages”, “Active Supply Disruptions”.
+  * Each tile: large number, tiny sparkline, trend chip (▲12% / ▼5%).
+* **Quick Actions (bottom card):**
+
+  * Three large buttons: “Run Simulation”, “View 21-Day Predictions”, “Hospital Mode”.
+
+**Timeline & Interaction Dock (Bottom Strip)**
+
+* Full-width card dock (80–100px height) anchored to bottom of main area.
+* Left: “Time Horizon” label + play/pause button for timeline animation.
+* Center: **Timeline slider** 0–21 days with labeled ticks at 0, 7, 14, 21.
+* Right: active date label + small toggle “Auto-play”.
+
+**Colour Palette & Theme**
+
+* Background: #020617
+* Surfaces: #050B1A / #0B1220
+* Primary Accent: #38BDF8 (cyan)
+* Secondary Accent: #4ADE80 (green)
+* Warning: #FACC15, Danger: #FB7185
+* Text primary: #F9FAFB, secondary: #9CA3AF, subtle labels: #6B7280
+
+**Typography**
+
+* Font: **Inter** or **SF Pro Display**.
+* Page title: 24–28px, semibold. Card titles: 16–18px, semibold. Body text: 14px regular. KPI numbers: 28–32px medium.
+
+**Buttons & Components**
+
+* Buttons: medium size, 10px radius, semi-solid with gradient from #0EA5E9 to #22D3EE.
+* Hover: outer glow, slight scale-up (1.02), text turns pure white.
+* Icons: line icons with neon stroke.
+
+**Interactions & Animations**
+
+* Globe: slow idle rotation; on drag, rotate with easing. Hovering hotspots pulses them gently.
+* Timeline: dragging thumb updates subtle “rewind/fast-forward” motion on globe arcs.
+* Cards: on mount, fade-in + slide-up 8px using **Framer Motion style** easing.
+* Alerts feed: auto-scroll with smooth easing; new alerts briefly highlight with a cyan border.
+
+**Constraints**
+
+* **No left nav drawer.** Navigation is entirely via the top bar and in-content buttons.
+* Screen must feel like a **mission control center** for outbreak + supply + risk.
+* Layout must be 1440px desktop-first, responsive down only to 1280px without collapsing major regions. 
+
+---
+
+### 2️⃣ Region Drill-Down – “Regional Risk Intelligence View”
+
+**Prompt:**
+Design a **desktop Region Drill-Down screen** for a single region (e.g., “Maharashtra, India”) in the same **Futuristic Enterprise SaaS dark theme** as the Global Dashboard. This screen zooms in on one region’s outbreaks, inventory, and recommendations.
+
+**Layout & Structure**
+
+* **Top Bar (64px, reused from system):**
+
+  * Left: Back button (“← Global Dashboard”), region breadcrumb (“Global › India › Maharashtra”).
+  * Center: Region name + colored risk badge (“High”, “Medium”, “Low”).
+  * Right: Last updated timestamp, refresh icon, user avatar.
+* **Main Content:** 3-column layout with a central focus.
+
+  * **Top row:** Full-width **RegionHeader** summary strip.
+  * **Middle row:** 3 cards in 3-column layout: Outbreak Predictions, Inventory Status, Environmental Factors.
+  * **Bottom row:** Left = LocalMapView (wide). Right = ActionRecommendations card stacked above Download/Share controls.
+
+**RegionHeader Strip**
+
+* Horizontal summary card (full width, 120px height).
+* Left: Region name, subtext (“Population 15.2M, Urban-dominant”), risk score chip (numeric 0–100 with circular mini gauge).
+* Center: Horizontal risk bar (gradient from green to red) with marker for current level and label (“Risk Level: High – Escalating”).
+* Right: Two compact KPI pills: “Next 10 days cases +18%” and “Critical items: 5 at risk”; a small “Share” icon button.
+
+**OutbreakPredictionsCard**
+
+* Title: “Outbreak Predictions – Next 10 Days”.
+* List of diseases as rows: each row shows disease name, small line chart, % change, confidence tag.
+* Top-right of card: dropdown for forecast horizon (7 / 10 / 21 days).
+* Hover on row: highlight row and show tooltip with detailed numbers.
+
+**InventoryStatusCard**
+
+* Title: “Inventory Status – Critical Medical Items”.
+* Table-like layout with columns: Item, Days Remaining, Stock Level bar, Status tag.
+* At top: donut gauge showing “Overall Capacity %”.
+* Low-stock rows use warning (amber) or danger (red) tags.
+
+**EnvironmentalFactorsCard**
+
+* Title: “Environmental Drivers”.
+* Three small line/area charts stacked or in grid: Temperature, Humidity, Rainfall.
+* Below charts: mini map thumbnail showing mosquito breeding zones as glowing red patches.
+
+**LocalMapView**
+
+* 2D regional map (Leaflet-like) card with 20px radius.
+* Shows hospitals (cross icon markers), supply nodes (factory/warehouse icons), and shortage icons (red exclamation).
+* Top of map card: small filter row (checkboxes for Hospitals, Supply Nodes, Shortages).
+* Hover on marker: tooltip with label; click: small right-floating info bubble with more details.
+
+**ActionRecommendationsCard**
+
+* Title: “Recommended Actions – Next 14 Days”.
+* Numbered list with top 3 actions:
+
+  * Each item shows an icon (stockpile, routing, governance), short title, micro-description, priority tag (P1/P2).
+* Bottom area: secondary list titled “Government Notices” with pill tags for categories (Policy, Logistics, Public Advisory).
+* Right side of card footer: **Primary button “Download Region Report”** and ghost button “Copy Link”.
+
+**Colour, Typography & Components**
+
+* Same palette and font as Global Dashboard.
+* Maintain 24px spacing between cards, consistent 16–20px padding inside cards.
+* Card headers have cyan accent line or subtle top border.
+
+**Interactions & Animations**
+
+* Region risk badge animates (slight pulse) if risk is “High” and data updated in last few minutes.
+* Download Region Report: show non-blocking toast “Report generating…” followed by “Report ready” with link.
+* Hover on map markers and disease rows uses soft cyan glow.
+
+**Constraints**
+
+* Desktop-only screen, 1440px target.
+* No modal-heavy UX; most interactions stay in-page (toasts, small drawers allowed).
+* Must clearly communicate **risk + inventory + environment** at a glance.
+
+---
+
+### 3️⃣ Simulation Mode – “What-If Scenario Lab”
+
+**Prompt:**
+Design a **Simulation Mode desktop screen** in the same **dark, futuristic enterprise** theme. This page focuses on configuring and comparing simulation scenarios.
+
+**Layout & Structure**
+
+* **Top Bar:**
+
+  * Left: Title “Simulation Mode” + small label “What-if Scenario Lab”.
+  * Right: Scenario dropdown (Saved simulations), “New Scenario” button, user avatar.
+* **Main Split Layout:**
+
+  * Left side (35% width): **SimulationControlPanel** (sticky vertical panel).
+  * Right side (65% width): **ComparisonView** and **ImpactSummary** stacked vertically.
+* **Bottom area:** TimelineComparison card spanning full width.
+
+**SimulationControlPanel**
+
+* Card with vertical step-like layout.
+* Section 1: Scenario selection.
+
+  * Dropdown for “Predefined Scenario” with tags (Flood, Pandemic Wave, Export Ban).
+  * Small description text under selected scenario.
+* Section 2: Parameter sliders (rainfall change, mobility variation, infection multiplier, supply severity).
+
+  * Each slider:
+
+    * Label, current numeric value chip, min/max labels.
+    * Style: neon cyan track, thumb with subtle glow, track background muted.
+* Section 3: Buttons row.
+
+  * Primary: “Run Simulation” (prominent).
+  * Secondary: “Reset Parameters” ghost button.
+* At bottom: info box showing “Est. runtime: ~X seconds” and last simulation ID.
+
+**ComparisonView**
+
+* Title: “Current vs Simulated State”.
+* Two side-by-side cards:
+
+  * Left card: “Current State” – mini map or globe snapshot plus KPIs.
+  * Right card: “Simulated State” – similar layout but with **diff overlays**.
+* Each card shows:
+
+  * Region scope selector (Global / Region / Custom).
+  * Outbreak heatmap thumbnail.
+  * 3–4 KPIs: Predicted Cases, Shortage Regions, Critical Alerts, Supply Stress.
+* Between them: column of “Change indicators” with ▲/▼ percentages and arrows.
+
+**ImpactSummaryCard**
+
+* Title: “Impact Summary”.
+* Two-column layout:
+
+  * Left: textual bullets: “New hotspots: X”, “Additional shortages: Y regions”, “Population affected: Z M”.
+  * Right: small horizontal bar chart stacked by severity levels.
+* Footer: “Recommended Actions” pill list (e.g., “Redistribute PPE”, “Activate Alternative Supplier Network”).
+
+**TimelineComparison**
+
+* Full-width card at bottom.
+* Dual-line chart: current vs simulated metrics (e.g., cases, shortages) over time.
+* Legend: “Current” (muted cyan), “Simulated” (brighter cyan/green).
+* Top-right: “Export Simulation Report” button.
+
+**Colours, Typography & Components**
+
+* Same global palette.
+* Simulation sections may use purple accent (#A855F7) subtly to differentiate from real-time views.
+* Font: Inter/SF Pro; bigger emphasis on numeric data.
+
+**Interactions & Animations**
+
+* Run Simulation:
+
+  * Button enters loading state: spinner inside, label changes to “Running…”.
+  * Control panel dims slightly; right-side shows skeleton loaders.
+  * On completion, content fades in with slight slide.
+* Sliders: smooth update, numerical chip counts up/down with small easing.
+* Export Simulation Report: shows toast and subtle progress indicator at top-right.
+
+**Constraints**
+
+* Desktop-first, 1440px.
+* No full-screen modal takeover. Results must remain visible alongside controls for iteration.
+* Screen should convey **experimentation and safety**: changes are simulated, not live.
+
+---
+
+### 4️⃣ Hospital Collaboration Dashboard – “Hospital Command Hub”
+
+**Prompt:**
+Design a **Hospital Collaboration Dashboard** as a desktop screen in the same futuristic dark enterprise style. This view is focused on one hospital or hospital network.
+
+**Layout & Structure**
+
+* **Top Bar:**
+
+  * Left: “Hospital Dashboard” + hospital selector dropdown.
+  * Right: Preparedness score badge + avatar.
+* **Primary Layout:** 2-column grid with responsive wrapping.
+
+  * Top: full-width **HospitalProfileSection**.
+  * Middle row: InventoryUploadCard (left), ShortageAlertsCard (right).
+  * Bottom row: CollaborationFeed (left), PredictiveInsights + optional Leaderboard (right).
+
+**HospitalProfileSection**
+
+* Full-width ribbon card.
+* Left: Hospital name, city, type (Teaching / District), bed capacity.
+* Center: **Preparedness Score ring gauge** (0–100) with color-coded ring (green–amber–red).
+* Right: badges (“High Collaboration”, “Early Adopter”), tiny leaderboard rank (e.g., #4 in region).
+
+**InventoryUploadCard**
+
+* Title: “Inventory Sync”.
+* Two tabs: “Upload CSV/Excel” and “Manual Entry”.
+* Upload tab:
+
+  * Drag-and-drop area with dashed neon border and icon.
+  * Label: “Drop latest inventory file or click to browse.”
+* Manual tab:
+
+  * Compact form table: Item, Quantity, Unit, Expiry Date, Add row button.
+* Bottom: Primary button “Update Inventory”, secondary “View Last Sync Log”.
+* Show “Last Sync: [timestamp]” with a status dot (green if successful).
+
+**ShortageAlertsCard**
+
+* Title: “Shortage Alerts”.
+* Filter row at top: severity filters (All / Critical / Warning) as chip buttons.
+* Alert list rows:
+
+  * Each shows item name, severity badge, estimated shortage date, “Action required” tags.
+* Click row: expand inline to show more context (related hospitals, suggested actions).
+
+**CollaborationFeed**
+
+* Title: “Collaboration Marketplace & Chat”.
+* Upper section:
+
+  * Two primary buttons: “Request Item” and “Offer Surplus” (open modal/side sheet).
+  * Below: list of active requests/offers as cards with hospital name, item, qty, distance, status.
+* Lower section:
+
+  * Real-time chat panel: list of messages with hospital avatars, timestamps, typing indicator.
+  * Input field with send button; show online status at top (“5 hospitals online”).
+
+**PredictiveInsightsCard & LeaderboardPanel**
+
+* Predictive Insights:
+
+  * Mini cards for “Upcoming Outbreak Risk”, “Stockpile Recommendations”, “Supply Chain Alerts”.
+  * Each card has icon, short description, and a “View Details” tiny link.
+* Leaderboard:
+
+  * Compact table: Rank, Hospital, Score, Trend arrow.
+
+**Visual Style**
+
+* Same dark palette; for hospitals, introduce subtle teal accent (#14B8A6).
+* Cards use soft glow when active; never harsh neon on large surfaces.
+
+**Interactions & Animations**
+
+* Inventory Update: shows inline progress bar and toast.
+* New chat messages slide in from bottom with tiny fade.
+* Shortage alerts with severity “Critical” have a very soft pulsing border, not too distracting.
+
+**Constraints**
+
+* Desktop-only, 1440px.
+* No side nav drawer; navigation via top bar and in-page controls.
+* Must clearly feel like a **collaboration & readiness** hub, not just analytics.
+
+---
+
+### 5️⃣ Supply Chain Mapping View – “Network Intelligence Map”
+
+**Prompt:**
+Design a **Supply Chain Mapping View** screen for visualizing deep-tier supply networks in the same dark futuristic enterprise style.
+
+**Layout & Structure**
+
+* **Top Bar:**
+
+  * Left: “Supply Chain Network” title.
+  * Center: disease filter dropdown (“Show network for: [Disease]”).
+  * Right: buttons “Find Alternative Suppliers” and “Export Recommendations” (disabled until a node is selected).
+* **Main Content Layout:**
+
+  * Left: large **SupplyChainGraphView** (network diagram).
+  * Right: vertical stack of **Node Details Panel**, **FilterPanel**, and **DisruptionTimelineCard**.
+* **Bottom Overlay:** GlobalMapOverlay as a collapsible panel.
+
+**SupplyChainGraphView**
+
+* Centerpiece with dark canvas background, faint geometric grid.
+* Nodes:
+
+  * Different shapes for Disease, Treatment, Active Ingredient, Factory, Raw Material, Region, Supplier.
+  * Colors indicate risk/fragility level: green → amber → red.
+* Edges:
+
+  * Thin curved lines; thickness indicates volume or importance.
+  * Disrupted edges are dashed/glowing red.
+* Top-left mini legend for node types and risk colors.
+* Top-right controls for zoom, fit-to-screen, and layout mode (force-directed / layered tiers).
+
+**Node Details Panel**
+
+* Docked panel on right, 320–360px wide.
+* When no node is selected: show placeholder with hint “Select a node in the graph to see details.”
+* When node selected:
+
+  * Header: node name + type badge + risk score chip.
+  * Sections:
+
+    * “Status & Risk”: textual summary, status tag.
+    * “Dependencies”: pill list of connected nodes (“Supplies X”, “Depends on Y”).
+    * “Recent Events”: mini list with event icons (strike, flood, export ban), date, severity.
+  * “Find Alternatives” button anchored at bottom (primary).
+
+**FilterPanel**
+
+* Card below Node Details (or collapsible side section).
+* Controls:
+
+  * Multi-select dropdown for disease type.
+  * Region multi-select.
+  * Checkboxes: “Show only critical paths”, “Highlight disrupted nodes”.
+* Apply/Reset buttons at bottom; filters apply with animated transitions on graph (nodes fade in/out).
+
+**DisruptionTimelineCard**
+
+* Small card listing current and upcoming disruptions as a vertical timeline.
+* Each event: icon, label, affected node, date range, severity indicator.
+
+**GlobalMapOverlay**
+
+* Collapsible bottom panel (~30% height) with a world map.
+* Shows factories, ports, regions, and disruption markers as icons.
+* Toggle button to collapse/expand; map uses same dark theme with glowing outlines.
+
+**Visuals & Interactions**
+
+* Clicking node highlights its neighbors; others fade.
+* Hover shows quick tooltip with name and risk.
+* Panning & zooming on the graph must feel smooth, with slight inertia.
+* When “Find Alternatives” is clicked:
+
+  * Node Details shows loading shimmer, then a list of alternative suppliers with capacity bars and lead time badges. Buttons “Export as CSV”.
+
+**Constraints**
+
+* Desktop, 1440px.
+* No draggable windows; keep a clean main canvas + right panel pattern.
+* Focus on **clarity of complex graph**, not ornamental visuals.
+
+---
+
+### 6️⃣ Analytics & Reports – “Insights & Evidence Hub”
+
+**Prompt:**
+Design the **Analytics & Reports** desktop screen for performance insights and custom reporting, using the same dark futuristic enterprise style.
+
+**Layout & Structure**
+
+* **Top Bar:**
+
+  * Left: Title “Analytics & Reports”.
+  * Right: DateRangePicker (from–to) + “Refresh” icon button.
+* **Main Layout:**
+
+  * First row: MetricsGrid (4 KPI cards).
+  * Second row: two-column: PredictionAccuracyChart (left) and SupplyChainHealthScore (right).
+  * Third row: RegionalPerformanceHeatmap (large) and ExportSection + CustomReportBuilder in a side panel or bottom segment.
+
+**MetricsGrid**
+
+* Four equal cards in a 2x2 grid.
+* Cards:
+
+  * “Overall Prediction Accuracy”, “Alerts vs Actual Events”, “Supply Disruptions Prevented”, “Regions Covered”.
+* Each card: big number, small label, tiny trend chart, and colored trend chip.
+
+**PredictionAccuracyChart**
+
+* Large line chart card.
+* Tabs: “By Disease”, “By Region”.
+* Chart: predicted vs actual lines, with shaded error region.
+* Hover shows tooltip with date, predicted, actual, and difference.
+
+**SupplyChainHealthScore**
+
+* Right card with gauge plus breakdown list.
+* Gauge: semi-circular, color-coded.
+* Below: list of contributing factors with small bar indicators (e.g., Disruptions, Inventory, Lead Times).
+
+**RegionalPerformanceHeatmap**
+
+* World/regional map card with heat tiles or choropleth.
+* On click on a region: right-aligned sidebar slides open to show region-focused metrics.
+
+**ExportSection**
+
+* Compact card with three primary actions:
+
+  * “Export Full PDF Report”, “Export CSV Data”, “Open API Docs”.
+* Each represented as icon + label + short description.
+* Buttons should clearly differentiate primary (PDF) vs secondary (CSV, docs).
+
+**CustomReportBuilder**
+
+* Card with form-like layout:
+
+  * Multi-select for metrics (checkboxes for predictions, disruptions, inventory, etc.).
+  * Date range inherit from global or custom.
+  * Region filters (global/selected).
+* Primary button “Generate Custom Report”.
+* Show subtle preview hint: “This will generate a downloadable PDF/CSV”.
+
+**Style & Interactions**
+
+* Same dark palette; use more cyan and green for “accuracy/success” feel.
+* Charts animate on load (lines draw in, bars grow).
+* Export actions show toasts for “Report generation started” and “Report ready”.
+* Clicking API Docs opens new tab (just visually represented).
+
+**Constraints**
+
+* Desktop, 1440px.
+* DO NOT use popups for exports; keep everything inline and toast-based.
+
+---
+
+### 7️⃣ Settings & Configuration – “System Settings Center”
+
+**Prompt:**
+Design a **Settings & Configuration** desktop screen with grouped sections in the same dark futuristic enterprise style.
+
+**Layout & Structure**
+
+* **Top Bar:**
+
+  * Left: “Settings & Configuration”.
+  * Right: User avatar, role badge (Admin / Analyst).
+* **Main Layout:**
+
+  * Left: vertical settings navigation list.
+  * Right: content area with cards for each section.
+
+**Left Navigation (Section List)**
+
+* Slim panel with list items: “Profile”, “Notifications”, “Map & Display”, “Data Sources”, “Access Control”, “System Info”.
+* Selected item has neon cyan left border and subtle glow.
+
+**Right Content Area**
+
+* Each section renders as a group of cards:
+
+**UserProfile**
+
+* Form card with fields: Name, Email, Role (read-only), Time Zone.
+* Two buttons: “Save Changes” (primary) and “Cancel” (ghost).
+
+**NotificationPreferences**
+
+* Toggles and sliders for:
+
+  * “Critical Alerts”, “New Simulations Ready”, “Supply Disruptions”, “Weekly Summary”.
+* Email, SMS, In-app toggles grouped per category.
+
+**MapPreferences**
+
+* Controls: default map center (dropdown or search), zoom slider, animation speed (slow/normal/fast radio buttons), default layers checkboxes (Outbreak, Supply, Mobility, Shortages).
+
+**DataSources**
+
+* Table/list of connected data sources with status pill (Connected / Degraded / Offline).
+* Each row has “Last Sync” and “Refresh” icon button.
+* Top right: “Refresh All” button.
+
+**AccessControl (Admin Only)**
+
+* List of users with roles and status.
+* Buttons for “Invite User”, “Edit”, “Deactivate”.
+* Simple modal/drawer for editing user role.
+
+**SystemInfo**
+
+* Static card showing app version, TOS link, privacy link, and support contact.
+
+**Style & Interactions**
+
+* Forms use understated borders; focus states glow cyan.
+* Save buttons show inline success state and toast.
+* Left nav scrolls if many sections.
+
+**Constraints**
+
+* Desktop, 1440px.
+* Avoid clutter; settings must feel safe and reversible.
+
+---
+
+### 8️⃣ Public Health Cast (Mobile Web) – “Local Health Companion”
+
+**Prompt:**
+Design a **mobile-first Public Health Cast screen** for 390×844 viewport (e.g., iPhone 14) in the same futuristic style but optimized for **touch** and **readability**.
+
+**Overall Layout**
+
+* **Top App Bar:**
+
+  * Left: app logo icon.
+  * Center: “Health Cast”.
+  * Right: simple bell icon for notifications.
+* **Content:** vertically scrollable stack of cards with large tap targets and comfortable spacing.
+
+**LocationPermissionPrompt (conditional top card)**
+
+* If location not granted:
+
+  * Card with illustration placeholder + text “Allow location to personalize risk insights”.
+  * Primary button “Enable Location”.
+
+**UserLocationCard**
+
+* Shows city name, current risk score chip, and weather snippet.
+* Background: subtle gradient from deep blue to slightly lighter blue.
+* Large risk indicator (numeric + label “Risk: Medium”).
+
+**HyperLocalWarningsCard**
+
+* Title: “Warnings Near You”.
+* List of alert cards, each full-width tappable:
+
+  * Icon (e.g., biohazard or weather), title, severity badge, 2-line description, “Learn more” chevron.
+
+**NearbyPharmacyStatus**
+
+* Card with mini map (static snapshot) at top and a vertical list of pharmacies below.
+* Each pharmacy row: name, distance, stock status pill, Call and Navigate icon buttons.
+* At top: filter chips for “All”, “Masks”, “Antivirals”, “Vaccines”.
+
+**BehavioralNudgesCard**
+
+* Daily health tip card with icon, tip text, and “Why this matters” collapsible section.
+* Share button (system share sheet icon).
+
+**UpcomingRisks**
+
+* Horizontal scroll of 7 small day cards: date, risk icon, severity dot, micro-tip.
+
+**CommunityAlerts**
+
+* Title: “Community Alerts”.
+* List of short user-reported entries with small upvote/downvote buttons.
+* “Submit Alert” button at bottom opens full-screen sheet with form (title, category, description, location).
+
+**Theme & Typography**
+
+* Same dark palette; extra emphasis on contrast and legibility.
+* Font: Inter/SF Pro, 16px base, 18–20px for key text.
+* Buttons: full-width, 12px radius, tall (48–52px height).
+
+**Interactions & Animations**
+
+* Pull-to-refresh gesture on main list.
+* Card press: shrink effect + shadow reduction for tap feedback.
+* Transitions between details and list: slide-in from right, back swipe gesture hint.
+
+**Constraints**
+
+* **Mobile-only**, primary width 360–414px.
+* No complex multi-column layouts; everything stacked.
+* Must feel like a **consumer-facing health companion** while visually consistent with the enterprise suite.
