@@ -4,6 +4,8 @@ import Globe from 'react-globe.gl';
 interface Globe3DProps {
     points?: any[];
     arcs?: any[];
+    ringsData?: any[];
+    labelsData?: any[];
     onPointClick?: (point: any) => void;
 }
 
@@ -37,12 +39,12 @@ export const Globe3D = ({ points = [], arcs = [], onPointClick }: Globe3DProps) 
     }, []);
 
     return (
-        <div ref={containerRef} className="w-full h-full min-h-[500px] rounded-xl overflow-hidden border border-border bg-black/20 relative">
+        <div ref={containerRef} className="w-full h-full min-h-[500px] rounded-xl overflow-hidden border border-border bg-gradient-to-b from-blue-900/30 to-purple-900/30 relative">
             <Globe
                 ref={globeEl}
                 width={dimensions.width}
                 height={dimensions.height}
-                globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
+                globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
                 bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
                 backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
 
@@ -51,10 +53,28 @@ export const Globe3D = ({ points = [], arcs = [], onPointClick }: Globe3DProps) 
                 pointLat="lat"
                 pointLng="lng"
                 pointColor="color"
-                pointAltitude={0.01}
+                pointAltitude={0.05}
                 pointRadius="radius"
-                pointsMerge={true}
+                pointsMerge={false}
+                pointPulseing={true}
                 onPointClick={onPointClick}
+
+                // Rings (For Demo/Alerts)
+                ringsData={points.filter(p => p.type === 'outbreak' || p.radius > 0.5)}
+                ringColor={(t: any) => (t: any) => `rgba(255,100,50,${Math.sqrt(1 - t)})`}
+                ringMaxRadius="maxR"
+                ringPropagationSpeed={2}
+                ringRepeatPeriod={800}
+
+                // Labels
+                labelsData={points}
+                labelLat="lat"
+                labelLng="lng"
+                labelText="label"
+                labelSize={1.5}
+                labelDotRadius={0.5}
+                labelColor={() => 'rgba(255, 255, 255, 0.75)'}
+                labelResolution={2}
 
                 // Arcs (Supply Routes)
                 arcsData={arcs}
@@ -62,11 +82,12 @@ export const Globe3D = ({ points = [], arcs = [], onPointClick }: Globe3DProps) 
                 arcDashLength={0.4}
                 arcDashGap={0.2}
                 arcDashAnimateTime={1500}
-                arcStroke={0.5}
+                arcStroke={0.8}
+                arcAltitude={0.2}
 
                 // Atmosphere
-                atmosphereColor="#3a228a"
-                atmosphereAltitude={0.15}
+                atmosphereColor="rgba(100, 200, 255, 1)"
+                atmosphereAltitude={0.25}
             />
 
             <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md p-3 rounded-lg border border-white/10 text-xs">

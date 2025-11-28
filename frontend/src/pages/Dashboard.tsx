@@ -4,22 +4,39 @@ import { StatsPanel } from '../components/dashboard/StatsPanel';
 import { MockServiceA, ServiceB } from '../api/client';
 import { Play, Pause, Calendar, AlertTriangle, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+
 
 const Dashboard = () => {
+    const navigate = useNavigate();
     const [isPlaying, setIsPlaying] = useState(false);
     const [timelineDay, setTimelineDay] = useState(0);
     const [globePoints, setGlobePoints] = useState<any[]>([]);
     const [globeArcs, setGlobeArcs] = useState<any[]>([]);
+
+    const [alerts, setAlerts] = useState<any[]>([]);
+    const [insights, setInsights] = useState<any>(null);
+
+    const handlePointClick = (point: any) => {
+        if (point && point.region) {
+            navigate(`/region/${point.region}`);
+        }
+    };
 
     // Data loading
     useEffect(() => {
         const loadData = async () => {
             try {
                 // Fetch data from backend services
-                const [outbreaks, _graphData] = await Promise.all([
+                const [outbreaks, _graphData, alertsRes, insightsRes] = await Promise.all([
                     MockServiceA.getOutbreaks(),
-                    ServiceB.getGraphData()
+                    ServiceB.getGraphData(),
+                    MockServiceA.getDashboardAlerts(),
+                    MockServiceA.getDashboardInsights()
                 ]);
+
+                setAlerts(alertsRes.data);
+                setInsights(insightsRes.data);
 
                 // Transform Outbreaks to Globe Points
                 const points = outbreaks.data.map((o: any) => ({
@@ -71,6 +88,65 @@ const Dashboard = () => {
         return () => clearInterval(interval);
     }, [isPlaying]);
 
+    const [isDemoMode, setIsDemoMode] = useState(false);
+
+    // Demo Data Generator
+    const getDemoData = () => {
+        const demoPoints = [
+            { lat: 20.5937, lng: 78.9629, radius: 1.5, maxR: 5, color: '#ef4444', label: 'India (Critical)', type: 'outbreak', region: 'R001' },
+            { lat: 35.8617, lng: 104.1954, radius: 1.2, maxR: 4, color: '#eab308', label: 'China (Warning)', type: 'outbreak', region: 'R002' },
+            { lat: -14.2350, lng: -51.9253, radius: 1.2, maxR: 4, color: '#eab308', label: 'Brazil (Warning)', type: 'outbreak', region: 'R003' },
+            { lat: 37.0902, lng: -95.7129, radius: 0.8, maxR: 0, color: '#3b82f6', label: 'USA (Hub)', type: 'hub', region: 'R004' },
+            { lat: 51.1657, lng: 10.4515, radius: 0.8, maxR: 0, color: '#3b82f6', label: 'Germany (Hub)', type: 'hub', region: 'R005' },
+            { lat: -25.2744, lng: 133.7751, radius: 0.8, maxR: 0, color: '#3b82f6', label: 'Australia (Hub)', type: 'hub', region: 'R006' },
+            { lat: 1.3521, lng: 103.8198, radius: 0.8, maxR: 0, color: '#3b82f6', label: 'Singapore (Hub)', type: 'hub', region: 'R007' },
+            { lat: -1.2864, lng: 36.8172, radius: 1.0, maxR: 3, color: '#f97316', label: 'Kenya (Moderate)', type: 'outbreak', region: 'R008' },
+            { lat: 55.7558, lng: 37.6173, radius: 0.7, maxR: 0, color: '#3b82f6', label: 'Russia (Hub)', type: 'hub', region: 'R009' },
+            { lat: 35.6762, lng: 139.6503, radius: 0.7, maxR: 0, color: '#3b82f6', label: 'Japan (Hub)', type: 'hub', region: 'R010' },
+        ];
+
+        const demoArcs = [
+            // USA connections
+            { startLat: 37.0902, startLng: -95.7129, endLat: 51.1657, endLng: 10.4515, color: ['#3b82f6', '#3b82f6'] },
+            { startLat: 37.0902, startLng: -95.7129, endLat: -14.2350, endLng: -51.9253, color: ['#3b82f6', '#eab308'] },
+            { startLat: 37.0902, startLng: -95.7129, endLat: 35.6762, endLng: 139.6503, color: ['#3b82f6', '#3b82f6'] },
+            { startLat: 37.0902, startLng: -95.7129, endLat: 20.5937, endLng: 78.9629, color: ['#3b82f6', '#ef4444'] },
+
+            // Germany connections  
+            { startLat: 51.1657, startLng: 10.4515, endLat: 20.5937, endLng: 78.9629, color: ['#3b82f6', '#ef4444'] },
+            { startLat: 51.1657, startLng: 10.4515, endLat: -1.2864, endLng: 36.8172, color: ['#3b82f6', '#f97316'] },
+            { startLat: 51.1657, startLng: 10.4515, endLat: 35.8617, endLng: 104.1954, color: ['#3b82f6', '#eab308'] },
+            { startLat: 51.1657, startLng: 10.4515, endLat: 55.7558, endLng: 37.6173, color: ['#3b82f6', '#3b82f6'] },
+
+            // Asia connections
+            { startLat: 1.3521, startLng: 103.8198, endLat: 35.8617, endLng: 104.1954, color: ['#3b82f6', '#eab308'] },
+            { startLat: 1.3521, startLng: 103.8198, endLat: 20.5937, endLng: 78.9629, color: ['#3b82f6', '#ef4444'] },
+            { startLat: 1.3521, startLng: 103.8198, endLat: -25.2744, endLng: 133.7751, color: ['#3b82f6', '#3b82f6'] },
+            { startLat: 35.6762, startLng: 139.6503, endLat: 35.8617, endLng: 104.1954, color: ['#3b82f6', '#eab308'] },
+            { startLat: 35.6762, startLng: 139.6503, endLat: 20.5937, endLng: 78.9629, color: ['#3b82f6', '#ef4444'] },
+
+            // Africa connections
+            { startLat: -1.2864, startLng: 36.8172, endLat: 20.5937, endLng: 78.9629, color: ['#f97316', '#ef4444'] },
+            { startLat: -1.2864, startLng: 36.8172, endLat: 1.3521, endLng: 103.8198, color: ['#f97316', '#3b82f6'] },
+
+            // South America connections
+            { startLat: -14.2350, startLng: -51.9253, endLat: -1.2864, endLng: 36.8172, color: ['#eab308', '#f97316'] },
+            { startLat: -14.2350, startLng: -51.9253, endLat: 51.1657, endLng: 10.4515, color: ['#eab308', '#3b82f6'] },
+
+            // Australia connections
+            { startLat: -25.2744, startLng: 133.7751, endLat: 35.8617, endLng: 104.1954, color: ['#3b82f6', '#eab308'] },
+
+            // Russia connections
+            { startLat: 55.7558, startLng: 37.6173, endLat: 35.8617, endLng: 104.1954, color: ['#3b82f6', '#eab308'] },
+            { startLat: 55.7558, startLng: 37.6173, endLat: 20.5937, endLng: 78.9629, color: ['#3b82f6', '#ef4444'] },
+        ];
+
+        return { points: demoPoints, arcs: demoArcs };
+    };
+
+    const displayPoints = isDemoMode ? getDemoData().points : globePoints;
+    const displayArcs = isDemoMode ? getDemoData().arcs : globeArcs;
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -97,15 +173,26 @@ const Dashboard = () => {
                         Real-time monitoring of disease outbreaks and supply chain resilience.
                     </motion.p>
                 </div>
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="flex items-center gap-2 bg-card/50 backdrop-blur-md border border-border/50 p-2 rounded-lg shadow-lg"
-                >
-                    <Calendar className="w-4 h-4 text-blue-400" />
-                    <span className="text-sm font-medium">Nov 28, 2025</span>
-                </motion.div>
+                <div className="flex gap-3">
+                    <motion.button
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.4 }}
+                        onClick={() => setIsDemoMode(!isDemoMode)}
+                        className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${isDemoMode ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/25' : 'bg-card border border-border hover:bg-muted'}`}
+                    >
+                        <Play className="w-4 h-4" /> {isDemoMode ? 'Exit Demo' : 'Demo Mode'}
+                    </motion.button>
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.4 }}
+                        className="flex items-center gap-2 bg-card/50 backdrop-blur-md border border-border/50 p-2 rounded-lg shadow-lg"
+                    >
+                        <Calendar className="w-4 h-4 text-blue-400" />
+                        <span className="text-sm font-medium">Nov 28, 2025</span>
+                    </motion.div>
+                </div>
             </div>
 
             <StatsPanel />
@@ -119,7 +206,7 @@ const Dashboard = () => {
                     className="lg:col-span-2 flex flex-col gap-4"
                 >
                     <div className="flex-1 min-h-[400px] relative group rounded-2xl overflow-hidden border border-border/50 shadow-2xl bg-black/20 backdrop-blur-sm">
-                        <Globe3D points={globePoints} arcs={globeArcs} />
+                        <Globe3D points={displayPoints} arcs={displayArcs} onPointClick={handlePointClick} />
 
                         {/* Timeline Controls Overlay */}
                         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-black/60 backdrop-blur-xl border border-white/10 rounded-full p-2 flex items-center gap-4 shadow-2xl">
@@ -167,47 +254,49 @@ const Dashboard = () => {
                             Live Alerts
                         </h3>
                         <div className="space-y-3">
-                            {[1, 2, 3].map((i) => (
+                            {alerts.map((alert: any) => (
                                 <motion.div
-                                    key={i}
+                                    key={alert.id}
                                     whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.05)" }}
                                     className="p-3 rounded-xl bg-muted/30 border border-border/50 transition-all cursor-pointer group"
                                 >
                                     <div className="flex justify-between items-start mb-1">
-                                        <span className="text-xs font-bold text-red-400 flex items-center gap-1">
-                                            <AlertTriangle className="w-3 h-3" /> Critical Alert
+                                        <span className={`text-xs font-bold flex items-center gap-1 ${alert.severity === 'high' ? 'text-red-400' : alert.severity === 'medium' ? 'text-yellow-400' : 'text-blue-400'}`}>
+                                            <AlertTriangle className="w-3 h-3" /> {alert.type}
                                         </span>
-                                        <span className="text-[10px] text-muted-foreground font-mono">2m ago</span>
+                                        <span className="text-[10px] text-muted-foreground font-mono">{alert.time}</span>
                                     </div>
-                                    <p className="text-sm font-medium group-hover:text-blue-200 transition-colors">Dengue spike detected in Mumbai Region</p>
-                                    <p className="text-xs text-muted-foreground mt-1">Predicted +40% cases in 7 days.</p>
+                                    <p className="text-sm font-medium group-hover:text-blue-200 transition-colors">{alert.message}</p>
+                                    <p className="text-xs text-muted-foreground mt-1">{alert.detail}</p>
                                 </motion.div>
                             ))}
                         </div>
                     </motion.div>
 
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.7 }}
-                        className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 backdrop-blur-xl border border-blue-500/20 rounded-2xl p-5 h-1/3 shadow-xl relative overflow-hidden"
-                    >
-                        <div className="absolute inset-0 bg-blue-500/5 z-0"></div>
-                        <div className="relative z-10">
-                            <h3 className="font-semibold mb-3 text-blue-100 flex items-center gap-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-                                AI Insights
-                            </h3>
-                            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                                <p className="text-sm text-blue-200 leading-relaxed">
-                                    Supply chain disruption risk is <strong className="text-red-300">High</strong> for Artemisinin due to flooding in Vietnam.
-                                </p>
-                                <button className="text-xs text-blue-300 mt-3 hover:text-blue-200 flex items-center gap-1 group transition-colors">
-                                    View Recommendations <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                                </button>
+                    {insights && (
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.7 }}
+                            className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 backdrop-blur-xl border border-blue-500/20 rounded-2xl p-5 h-1/3 shadow-xl relative overflow-hidden"
+                        >
+                            <div className="absolute inset-0 bg-blue-500/5 z-0"></div>
+                            <div className="relative z-10">
+                                <h3 className="font-semibold mb-3 text-blue-100 flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                                    AI Insights
+                                </h3>
+                                <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                                    <p className="text-sm text-blue-200 leading-relaxed">
+                                        {insights.title}
+                                    </p>
+                                    <button className="text-xs text-blue-300 mt-3 hover:text-blue-200 flex items-center gap-1 group transition-colors">
+                                        {insights.action} <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    </motion.div>
+                        </motion.div>
+                    )}
                 </div>
             </div>
         </motion.div>

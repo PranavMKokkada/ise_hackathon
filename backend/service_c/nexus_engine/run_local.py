@@ -31,6 +31,6 @@ Base.metadata.create_all(bind=engine)
 print("Tables created.")
 
 if __name__ == "__main__":
-    print("Starting Local Nexus Engine on http://127.0.0.1:8003")
-    print("Swagger UI: http://127.0.0.1:8003/docs")
-    uvicorn.run(app, host="127.0.0.1", port=8003, log_level="info")
+    print("Starting Local Nexus Engine on http://127.0.0.1:8005")
+    print("Swagger UI: http://127.0.0.1:8005/docs")
+    uvicorn.run(app, host="127.0.0.1", port=8005, log_level="info")
