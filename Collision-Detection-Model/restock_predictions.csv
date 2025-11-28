@@ -1,5 +1,0 @@
-drugName,countInStock,days_until_expiry,restock_confidence_score,action_plan
-Aspirin 100mg,5,-363,94.0,🔴 CRITICAL: ACQUIRE IMMEDIATELY
-Bandages,2,763,57.599999999999994,🟡 HIGH: Order Soon
-Antibiotic X,100,-364,40.0,🔵 MEDIUM: Monitor
-Vitamin C,200,172,1.7777777777777772,🟢 LOW: Stock Healthy
