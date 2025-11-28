@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  neo4j:
+    image: neo4j:5.13
+    container_name: bionexus-neo4j
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    environment:
+      - NEO4J_AUTH=neo4j/bionexus123
+      - NEO4J_dbms_memory_pagecache_size=512M
+      - NEO4J_dbms_memory_heap_max__size=1G
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    networks:
+      - bionexus-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: bionexus-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=bionexus
+      - POSTGRES_PASSWORD=bionexus123
+      - POSTGRES_DB=bionexus
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - bionexus-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: bionexus-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - bionexus-network
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
+  postgres_data:
+  redis_data:
+
+networks:
+  bionexus-network:
+    driver: bridge
